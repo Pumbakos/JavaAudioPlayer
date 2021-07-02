@@ -30,11 +30,49 @@ public class Song {
         this.releaseDate = releaseDate;
     }
 
-    public Song(String title, String author, String album, LocalDate releaseDate) {
-        this.title = title;
-        this.author = author;
-        this.album = album;
-        this.releaseDate = releaseDate;
+    public static class Builder {
+        private Long id = null;
+        private String title = null;
+        private String author = null;
+        private String album = null;
+        private LocalDate releaseDate = null;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder author(String author) {
+            this.author = author;
+            return this;
+        }
+
+        public Builder album(String album) {
+            this.album = album;
+            return this;
+        }
+
+        public Builder releaseDate(LocalDate releaseDate) {
+            this.releaseDate = releaseDate;
+            return this;
+        }
+
+        public Song build(){
+            return new Song(this);
+        }
+    }
+
+    private Song(Builder builder){
+        this.id = builder.id;
+        this.title = builder.title;
+        this.author = builder.author;
+        this.album = builder.album;
+        this.releaseDate = builder.releaseDate;
     }
 
     public Long getId() {

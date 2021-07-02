@@ -46,14 +46,7 @@ public class SongService {
                 copy(file.getInputStream(), fileStorage, REPLACE_EXISTING);
 
                 String trimmedFilename = filename.substring(0, filename.length() - 4);
-//                Song songByTitle = repository.findSongByTitle(trimmedFilename);
-//                if(repository.existsById(songByTitle.getId())){
-//                    throw new SongAlreadyExistsException();
-//                }
-
-                //TODO: create builder pattern for Song
-                Song s = new Song();
-                s.setTitle(trimmedFilename);
+                Song s = new Song.Builder().title(trimmedFilename).build();
                 repository.save(s);
 
                 filenames.add(filename);

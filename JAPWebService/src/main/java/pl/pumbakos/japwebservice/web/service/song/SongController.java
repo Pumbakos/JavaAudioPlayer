@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(EndPoint.FILE)
-public class SongController {
+public class SongController implements EndPoint {
     private final SongService songService;
     private final SongRepository repository;
 

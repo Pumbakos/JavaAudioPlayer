@@ -11,30 +11,33 @@ public class SongConfig {
     @Bean
     CommandLineRunner commandLineRunner(SongRepository songRepository) {
         return args -> {
-            Song song1 = new Song(
-                    "Bandyta",
-                    "Sobel",
-                    "Pułapka na motyle",
-                    LocalDate.now()
-            );
-            Song song2 = new Song(
-                    "To ja",
-                    "Sobel",
-                    "Pułapka na motyle",
-                    LocalDate.now()
-            );
-            Song song3 = new Song(
-                    "Fiołkowe pole",
-                    "Sobel",
-                    "Pułapka na motyle",
-                    LocalDate.now()
-            );
-            Song song4 = new Song(
-                    "Kapie deszcz",
-                    "Sobel",
-                    "Pułapka na motyle",
-                    LocalDate.now()
-            );
+            Song song1 = new Song.Builder().
+                    title("Bandyta").
+                    author("Sobel").
+                    album("Pułapka na motyle").
+                    releaseDate(LocalDate.now()).
+                    build();
+
+            Song song2 = new Song.Builder().
+                    title("To ja").author("Sobel").
+                    album("Pułapka na motyle").
+                    releaseDate(LocalDate.now()).
+                    build();
+
+            Song song3 = new Song.Builder().
+                    title("Fiołkowe pole").
+                    author("Sobel").
+                    album("Pułapka na motyle").
+                    releaseDate(LocalDate.now()).
+                    build();
+
+            Song song4 = new Song.Builder().
+                    title("Kapie deszcz").
+                    author("Sobel").
+                    album("Pułapka na motyle").
+                    releaseDate(LocalDate.now()).
+                    build();
+
 
             songRepository.saveAll(List.of(song1, song2, song3, song4));
         };
