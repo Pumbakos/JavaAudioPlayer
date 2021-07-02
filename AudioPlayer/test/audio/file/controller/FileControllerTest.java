@@ -4,13 +4,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
+import pl.pumbakos.audioplayer.audio.file.controller.FileController;
 
 class FileControllerTest {
     private final String DEFAULT_PATH = "D:\\Desktop\\CODE\\JAVA\\AudioPlayer\\music\\wav\\";
 
     @Test
     void setDefaultFolderToNull() {
-        FileController fc = new FileController();
+        FileController fc = new FileController(DEFAULT_PATH);
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () -> fc.setDefaultFolder(null));
     }
 

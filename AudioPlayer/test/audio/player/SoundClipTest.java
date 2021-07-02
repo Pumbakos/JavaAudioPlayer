@@ -1,9 +1,10 @@
 package audio.player;
 
-import audio.controler.ClipQueue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import pl.pumbakos.audioplayer.audio.controler.ClipQueue;
+import pl.pumbakos.audioplayer.audio.player.SoundClip;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,7 +19,7 @@ class SoundClipTest {
     private String path = packageName + ".SoundClip";
 
     @Test
-    void setDefaultFolderToNull(){
+    void setDefaultFolderToNull() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> clip.setDefaultFolder(null));
     }
 
@@ -32,35 +33,35 @@ class SoundClipTest {
     }
 
     @Test
-    void playWithNullThread(){
+    void playWithNullThread() {
         NullPointerException e = assertThrows(NullPointerException.class, clip::play);
     }
 
     @Test
-    void stopWithNullSong(){
+    void stopWithNullSong() {
         NullPointerException e = assertThrows(NullPointerException.class, clip::stop);
     }
 
     @Test
-    void pauseWithNullSong(){
+    void pauseWithNullSong() {
         NullPointerException e = assertThrows(NullPointerException.class, clip::pause);
     }
 
     @Test
     @DisplayName("Add subscriber to subs list")
-    void addSubscriber(){
+    void addSubscriber() {
         assertTrue(clip.subscribe(new ClipQueue()));
     }
 
     @Test
     @DisplayName("Add null subscriber to subs list")
-    void addNullSubscriber(){
+    void addNullSubscriber() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> clip.subscribe(null));
     }
 
     @Test
     @DisplayName("Remove subscriber from subs list")
-    void removeSubscriber(){
+    void removeSubscriber() {
         ClipQueue cq = new ClipQueue();
         clip.subscribe(cq);
         assertTrue(clip.unsubscribe(cq));
@@ -68,13 +69,13 @@ class SoundClipTest {
 
     @Test
     @DisplayName("Remove null subscriber from subs list")
-    void removeNullSubscriber(){
+    void removeNullSubscriber() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> clip.unsubscribe(null));
     }
 
     @Test
     @DisplayName("Remove subscriber from empty subs list")
-    void removeSubscriberFromEmptyList(){
+    void removeSubscriberFromEmptyList() {
         ClipQueue cq = new ClipQueue();
         clip.subscribe(cq);
         clip.removeAllSubscribers();
@@ -83,7 +84,7 @@ class SoundClipTest {
 
     @Test
     @DisplayName("Remove null subscriber from empty subs list")
-    void removeNullSubscriberWhenListIsEmpty(){
+    void removeNullSubscriberWhenListIsEmpty() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> clip.unsubscribe(null));
     }
 }
