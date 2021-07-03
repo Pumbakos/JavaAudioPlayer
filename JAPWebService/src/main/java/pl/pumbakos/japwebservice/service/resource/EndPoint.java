@@ -9,4 +9,5 @@ public final class EndPoint {
    public static final String SIZE = "/size";
    public static final String TITLES = "/titles";
    public static final String SONG_TITLE = "/song_title";
+    public static final String UPDATE = "/update";
 }

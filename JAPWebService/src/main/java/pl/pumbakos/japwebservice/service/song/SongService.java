@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import pl.pumbakos.japwebservice.service.resource.Status;
@@ -18,6 +19,8 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import static java.nio.file.Files.copy;
@@ -42,6 +45,7 @@ public class SongService {
             for (MultipartFile file : multipartFiles) {
                 String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
+                //TODO: create enum with extension
                 if (!filename.endsWith(".wav")) {
                     return ResponseEntity.of(Optional.of(Collections.singletonList(Status.Message.BAD_EXTENSION)));
                 }
@@ -62,8 +66,32 @@ public class SongService {
         }
     }
 
+    @Transactional()
+    public ResponseEntity<HttpStatus> updateSongInfo(String title, String album, String author, String releaseDate) {
+        String trimmedTitle = title.replace('_', ' ');
+        Song song = repository.findByTitle(trimmedTitle);
+        if (song == null) {
+            return ResponseEntity.of(Optional.of(HttpStatus.UNPROCESSABLE_ENTITY));
+        }
+
+        try {
+            song.setAlbum(album.replace('_', ' '));
+            song.setAuthor(author);
+            song.setReleaseDate(LocalDate.parse(releaseDate));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.of(Optional.of(HttpStatus.PARTIAL_CONTENT));
+        }catch (NullPointerException e){
+            // DO NOTHING
+        }
+
+        return ResponseEntity.ok().body(HttpStatus.ACCEPTED);
+    }
+
+    /**
+     * @param filename - name of song in DB, it's better to use names w/o extensions
+     */
     public ResponseEntity<Object> downloadFiles(String filename) {
-        if (!filename.endsWith(".wav")){
+        if (!filename.endsWith(".wav")) {
             filename = filename.concat(".wav");
         }
         Resource resource;
@@ -82,15 +110,16 @@ public class SongService {
                     .headers(httpHeaders).body(resource);
         } catch (InvalidPathException | MalformedURLException e) {
             return ResponseEntity.of(Optional.of(Status.Message.INVALID_TITLE));
-        }catch(IOException e){
+        } catch (IOException e) {
             return ResponseEntity.of(Optional.of(HttpStatus.INTERNAL_SERVER_ERROR));
         }
     }
 
     public ResponseEntity<Long> getFileSize(String filename) {
+        String trimmedFilename = filename.replace('_', ' ');
         try {
-            return ResponseEntity.of(Optional.of(repository.getSongSizeByName(filename)));
-        }catch(NullPointerException e){
+            return ResponseEntity.ok().body(repository.findSongSizeByName(trimmedFilename));
+        } catch (NullPointerException e) {
             return ResponseEntity.of(Optional.of((long) Status.NO_CONTENT));
         }
     }
