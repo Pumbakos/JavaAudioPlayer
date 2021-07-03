@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice2.service.resource;
+package pl.pumbakos.japwebservice.service.resource;
 
 public interface EndPoint {
    String FILE = "/file";

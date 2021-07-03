@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice2.service.song;
+package pl.pumbakos.japwebservice.service.song;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;

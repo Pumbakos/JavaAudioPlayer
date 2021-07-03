@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice2.config;
+package pl.pumbakos.japwebservice.config;
 
 import org.h2.tools.Server;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice2.service.song;
+package pl.pumbakos.japwebservice.service.song;
 
 import javax.persistence.*;
 import java.time.LocalDate;

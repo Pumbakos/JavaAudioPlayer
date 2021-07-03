@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice2.service.song;
+package pl.pumbakos.japwebservice.service.song;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

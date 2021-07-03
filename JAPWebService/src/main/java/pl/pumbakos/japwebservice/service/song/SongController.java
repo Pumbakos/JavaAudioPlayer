@@ -1,11 +1,11 @@
-package pl.pumbakos.japwebservice2.service.song;
+package pl.pumbakos.japwebservice.service.song;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pl.pumbakos.japwebservice2.service.resource.EndPoint;
+import pl.pumbakos.japwebservice.service.resource.EndPoint;
 
 import java.io.IOException;
 import java.util.List;
