@@ -1,11 +1,12 @@
 package pl.pumbakos.japwebservice.service.song;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
 @Table
-public class Song {
+public class Song implements Serializable {
     @Id
     @SequenceGenerator(
             name = "song_sequence",
@@ -18,8 +19,18 @@ public class Song {
     private String author;
     private String album;
     private LocalDate releaseDate;
+    private Long size;
 
     public Song() {
+    }
+
+    public Song(Long id, String title, String author, String album, LocalDate releaseDate, Long size) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.album = album;
+        this.releaseDate = releaseDate;
+        this.size = size;
     }
 
     public Song(Long id, String title, String author, String album, LocalDate releaseDate) {
@@ -30,49 +41,13 @@ public class Song {
         this.releaseDate = releaseDate;
     }
 
-    public static class Builder {
-        private Long id = null;
-        private String title = null;
-        private String author = null;
-        private String album = null;
-        private LocalDate releaseDate = null;
-
-        public Builder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        public Builder author(String author) {
-            this.author = author;
-            return this;
-        }
-
-        public Builder album(String album) {
-            this.album = album;
-            return this;
-        }
-
-        public Builder releaseDate(LocalDate releaseDate) {
-            this.releaseDate = releaseDate;
-            return this;
-        }
-
-        public Song build(){
-            return new Song(this);
-        }
-    }
-
-    private Song(Builder builder){
+    private Song(Builder builder) {
         this.id = builder.id;
         this.title = builder.title;
         this.author = builder.author;
         this.album = builder.album;
         this.releaseDate = builder.releaseDate;
+        this.size = builder.size;
     }
 
     public Long getId() {
@@ -121,5 +96,48 @@ public class Song {
                 ", author='" + author + '\'' +
                 ", album='" + album + '\'' +
                 ", releaseDate='" + releaseDate;
+    }
+
+    public static class Builder {
+        private Long id = null;
+        private String title = null;
+        private String author = null;
+        private String album = null;
+        private LocalDate releaseDate = null;
+        private Long size = null;
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder author(String author) {
+            this.author = author;
+            return this;
+        }
+
+        public Builder album(String album) {
+            this.album = album;
+            return this;
+        }
+
+        public Builder releaseDate(LocalDate releaseDate) {
+            this.releaseDate = releaseDate;
+            return this;
+        }
+
+        public Builder size(Long size){
+            this.size = size;
+            return this;
+        }
+
+        public Song build() {
+            return new Song(this);
+        }
     }
 }
