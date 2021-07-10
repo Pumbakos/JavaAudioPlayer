@@ -32,6 +32,27 @@ public class SoundClip implements LineListener, Observer {
     private SoundClip() {
     }
 
+    private static class Flag{
+        private static boolean LOOP_OVER_FOLDER = true;
+        private static boolean LOOP_OVER_CLIP = false;
+    }
+
+    public boolean isLoopOverFolder() {
+        return Flag.LOOP_OVER_FOLDER;
+    }
+
+    public void setLoopOverFolder(boolean value) {
+        Flag.LOOP_OVER_FOLDER = value;
+    }
+
+    public boolean isLoopOverClip() {
+        return Flag.LOOP_OVER_CLIP;
+    }
+
+    public void setLoopOverClip(boolean value) {
+        Flag.LOOP_OVER_CLIP = value;
+    }
+
     public static SoundClip getInstance() {
         return Wrapper.instance;
     }

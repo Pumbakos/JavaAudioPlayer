@@ -17,6 +17,16 @@ public enum Command {
         this.name = name;
     }
 
+    public static Command toCommand(String stringCommand){
+        Command[] values = Command.values();
+        for (Command value : values) {
+            if (value.toString().equals(stringCommand)){
+                return value;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return name;

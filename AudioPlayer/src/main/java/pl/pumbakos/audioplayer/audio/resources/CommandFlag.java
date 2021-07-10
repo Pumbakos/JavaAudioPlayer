@@ -1,28 +1,11 @@
 package pl.pumbakos.audioplayer.audio.resources;
 
-public enum CommandFlag {
-    FOLDER_CHOOSE('c'),
-    LOOP_OVER_FOLDER("loop");
+public class CommandFlag{
+    public static final String LOOP_OVER = "loop";
+    public static final String FOLDER_CHOOSE = "choose";
 
-
-
-    private char character;
-    private String name;
-
-    CommandFlag(String name){
-        this.name = name;
-    }
-
-    CommandFlag(char character){
-        this.character = character;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    public char getChar(){
-        return character;
+    public static class Short{
+        public static final String LOOP_OVER = "l";
+        public static final String FOLDER_CHOOSE = "c";
     }
 }

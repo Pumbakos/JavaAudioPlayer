@@ -1,6 +1,8 @@
 package pl.pumbakos.audioplayer.audio.file.controller;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class FileController {
@@ -138,11 +140,12 @@ public class FileController {
     }
 
     public void setDefaultFolder(String defaultFolder){
-        if (defaultFolder == null){
+        if (defaultFolder == null || !Files.exists(Path.of(defaultFolder))){
             throw new IllegalArgumentException();
         }
         List<File> temp = List.copyOf(songClips);
         songClips.removeAll(temp);
+
         this.defaultFolder = defaultFolder;
         openFolder();
     }

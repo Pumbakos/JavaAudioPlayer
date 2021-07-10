@@ -5,9 +5,9 @@ import pl.pumbakos.audioplayer.audio.player.SoundClip;
 import java.util.Scanner;
 
 public class Controller{
-    private final Scanner scanner = new Scanner(System.in);
-    private SoundClip clip;
-    private ClipQueue queue;
+    protected final Scanner scanner = new Scanner(System.in);
+    protected SoundClip clip;
+    protected ClipQueue queue;
     private volatile String command;
     private volatile String lastCommand;
 

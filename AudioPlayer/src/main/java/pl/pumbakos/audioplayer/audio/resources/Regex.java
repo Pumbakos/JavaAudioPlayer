@@ -4,5 +4,12 @@ import org.intellij.lang.annotations.RegExp;
 
 public class Regex {
     @RegExp
-    public static final String COMMAND_REGEX = "^([A-Za-z]+)|([\\\\-]{1,2}[A-Za-z]+)$";
+    public static final String FOLDER_REGEX = "^[a-zA-Z]:\\\\(((?![<>:\"\\\\|?*]).)+((?<![ .])\\\\)?){1,256}$";
+
+    @RegExp
+    public static final String COMMAND_OR_FLAG = "^((\\-)*[A-Za-z]+(\\s)*)|(\\-\\-[A-Za-z]+\\-[A-Za-z]+)$";
+
+    @RegExp
+    public static final String COMMAND_REGEX = COMMAND_OR_FLAG + "|" + FOLDER_REGEX;
+
 }
