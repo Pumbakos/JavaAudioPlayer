@@ -4,16 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import pl.pumbakos.japwebservice.songmodule.models.Song;
-import pl.pumbakos.japwebservice.songmodule.resource.EndPoint;
 import pl.pumbakos.japwebservice.songmodule.services.SongService;
 
 import java.util.List;
 import java.util.Objects;
 
+import static pl.pumbakos.japwebservice.songmodule.resource.EndPoint.*;
+import static pl.pumbakos.japwebservice.songmodule.resource.EndPoint.PathVariable.*;
+
 @RestController
-@RequestMapping(EndPoint.SONG)
+@RequestMapping(SONG)
 public class SongController {
     private final SongService service;
 
@@ -22,7 +25,7 @@ public class SongController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping(consumes = "multipart/form-data", produces = "text/plain")
     public ResponseEntity<String> upload(@RequestParam("files") List<MultipartFile> multipartFiles) {
         String filename = StringUtils.cleanPath(Objects.requireNonNull(multipartFiles.get(0).getOriginalFilename()));
         if (multipartFiles.size() == 1 && filename.isBlank()) {
@@ -31,27 +34,27 @@ public class SongController {
         return service.upload(multipartFiles);
     }
 
-    @PutMapping(path = EndPoint.PathVariable.ID)
+    @PutMapping(path = ID, consumes = "application/json", produces = "text/plain")
     public ResponseEntity<String> update(@RequestBody Song song, @PathVariable(name = "id") Long id){
         return service.update(song, id);
     }
 
-    @GetMapping(path = EndPoint.PathVariable.FILENAME)
+    @GetMapping(path = FILENAME, consumes = "application/json", produces = "text/plain")
     public ResponseEntity<Object> download(@PathVariable("filename") String filename) {
         return service.download(filename);
     }
 
-    @GetMapping(path = EndPoint.INFO + EndPoint.PathVariable.FILENAME)
+    @GetMapping(path = INFO + FILENAME, consumes = "text/plain", produces = "text/plain")
     public ResponseEntity<Song> get(@PathVariable("filename") String filename) {
         return service.info(filename);
     }
 
-    @GetMapping(path = EndPoint.PathVariable.FILENAME + EndPoint.SIZE)
+    @GetMapping(path = SIZE + FILENAME, consumes = "text/plain", produces = "text/plain")
     public ResponseEntity<Long> getFileSize(@PathVariable("filename") String filename) {
         return service.getFileSize(filename);
     }
 
-    @GetMapping(path = EndPoint.ALL)
+    @GetMapping(path = ALL, produces = "application/json")
     public List<String> getTitles() {
         return service.getTitles();
     }

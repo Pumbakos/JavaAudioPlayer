@@ -14,9 +14,4 @@ public class SongControllerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     private final Gson gson = new Gson();
 
-    @Test
-    @DisplayName("POST files into server")
-    public void uploadCompleteFiles(){
-        Song song = SongGenerator.createCompleteSong();
-    }
 }

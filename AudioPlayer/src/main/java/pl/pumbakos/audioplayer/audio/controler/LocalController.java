@@ -77,7 +77,7 @@ public class LocalController extends Controller {
 
             List<String> commands = Arrays.asList(fragmentedCommand);
 
-            if(commandStack.empty()){
+            if(!commandStack.empty()){
                 Iterator<String> it = commandStack.iterator();
                 while(it.hasNext()){
                     it.next();
@@ -85,7 +85,7 @@ public class LocalController extends Controller {
                 }
             }
 
-            for (int i = 1; i < fragmentedCommand.length; ++i) {
+            for (int i = fragmentedCommand.length -1; i > 0 ; --i) {
                 commandStack.push(fragmentedCommand[i].replace("--", "").replace("-", ""));
             }
 
@@ -155,10 +155,11 @@ public class LocalController extends Controller {
         Command command = toCommand(this.primaryCommand);
         switch (Objects.requireNonNull(command)) {
             case PLAY: {
-                Iterator<String> iterator = stack.iterator();
+//                Iterator<String> iterator = stack.iterator();
 
-                while (iterator.hasNext()) {
-                    String cmd = iterator.next();
+                while (!stack.empty()) {
+//                    String cmd = iterator.next();
+                    String cmd = stack.pop();
                     System.out.println("STOS" + stack);
 
                     switch (cmd) {
@@ -176,6 +177,7 @@ public class LocalController extends Controller {
                             }
                             clip.play();
                         }
+                        break;
 
                         case CommandFlag.LOOP_OVER, CommandFlag.Short.LOOP_OVER: {
                             System.out.println("TOGGLED LOOP FLAG");
