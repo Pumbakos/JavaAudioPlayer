@@ -19,6 +19,10 @@ public enum CliError {
         return error + "\n" + message;
     }
 
+    public static String NO_FLAG_FOUND(String flag){
+        return NO_FLAG_FOUND + " '" + flag + "'";
+    }
+
     @Override
     public String toString() {
         return error;

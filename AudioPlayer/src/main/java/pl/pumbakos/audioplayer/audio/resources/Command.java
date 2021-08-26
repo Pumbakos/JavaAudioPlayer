@@ -20,7 +20,7 @@ public enum Command {
     public static Command toCommand(String stringCommand){
         Command[] values = Command.values();
         for (Command value : values) {
-            if (value.toString().equals(stringCommand)){
+            if (value.name.equals(stringCommand)){
                 return value;
             }
         }

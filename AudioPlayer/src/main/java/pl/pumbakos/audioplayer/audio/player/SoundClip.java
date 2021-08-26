@@ -1,27 +1,24 @@
 package pl.pumbakos.audioplayer.audio.player;
 
-import pl.pumbakos.audioplayer.audio.controler.ClipQueue;
-import pl.pumbakos.audioplayer.audio.controler.Controller;
-import pl.pumbakos.audioplayer.audio.controler.Observer;
-import pl.pumbakos.audioplayer.audio.controler.Subscriber;
+import jdk.jfr.BooleanFlag;
+import pl.pumbakos.audioplayer.audio.controler.*;
 import pl.pumbakos.audioplayer.audio.exception.SongNotSetException;
 import pl.pumbakos.audioplayer.audio.file.controller.FileController;
 
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 public class SoundClip implements LineListener, Observer {
     private final int AMENDMENT = 100;
-    private Thread mainClip;
-    private Controller controller = new Controller();
+    private Thread mainClipThread;
+    private Controller controller = new LocalController();
     private FileController fileController = new FileController("D:\\Desktop\\CODE\\JAVA\\AudioPlayer\\music\\wav\\");
     private List<Subscriber> subscribers = new ArrayList<>();
+    @BooleanFlag
     private volatile boolean playbackCompleted = false; //this flag indicates whether the playback completes or not
     private volatile String lastCommand;
     private volatile Clip audioClip;
@@ -29,43 +26,27 @@ public class SoundClip implements LineListener, Observer {
     private volatile String previousSong;
     private volatile String nextSong;
     private volatile int frameStoppedAt;
+
     private SoundClip() {
-    }
-
-    private static class Flag{
-        private static boolean LOOP_OVER_FOLDER = true;
-        private static boolean LOOP_OVER_CLIP = false;
-    }
-
-    public boolean isLoopOverFolder() {
-        return Flag.LOOP_OVER_FOLDER;
-    }
-
-    public void setLoopOverFolder(boolean value) {
-        Flag.LOOP_OVER_FOLDER = value;
-    }
-
-    public boolean isLoopOverClip() {
-        return Flag.LOOP_OVER_CLIP;
-    }
-
-    public void setLoopOverClip(boolean value) {
-        Flag.LOOP_OVER_CLIP = value;
     }
 
     public static SoundClip getInstance() {
         return Wrapper.instance;
     }
 
-    public void setProperties(ClipQueue queue, SoundClip clip){
-        controller.setProperties(queue, clip);
+    public FileController getFileController() {
+        return fileController;
     }
 
-    public void menu(){
+    public Controller getController() {
+        return controller;
+    }
+
+    public void menu() {
         controller.menu();
     }
 
-    public void cmd(){
+    public void cmd() {
         controller.cmd();
     }
 
@@ -91,7 +72,11 @@ public class SoundClip implements LineListener, Observer {
             audioClip.addLineListener(this);
             audioClip.open(audioStream);
 
-            mainClip = new Thread(() -> {
+            if(isLoopOverClip()){
+                audioClip.loop(Clip.LOOP_CONTINUOUSLY);
+            }
+
+            mainClipThread = new Thread(() -> {
                 audioClip.start();
                 playbackCompleted = false;
 
@@ -116,7 +101,7 @@ public class SoundClip implements LineListener, Observer {
 
     public final void play() throws NullPointerException, SongNotSetException {
         if (prepareClip(getDefaultFolder() + currentSong))
-            mainClip.start();
+            mainClipThread.start();
         else throw new SongNotSetException();
     }
 
@@ -151,12 +136,12 @@ public class SoundClip implements LineListener, Observer {
         if (playbackCompleted) {
             audioClip.setFramePosition(frameStoppedAt - AMENDMENT);
 
-            if (!mainClip.isInterrupted()) {
-                mainClip.interrupt();
+            if (!mainClipThread.isInterrupted()) {
+                mainClipThread.interrupt();
             }
 
             playbackCompleted = false;
-            mainClip.start();
+            mainClipThread.start();
             while (!playbackCompleted) {
                 sleep(1000);
             }
@@ -175,6 +160,7 @@ public class SoundClip implements LineListener, Observer {
         lastCommand = controller.getLastCommand();
         currentSong = fileController.setCurrentSong(getIndex() + 1);
 
+        //TODO: stop playing when LOOP_OVER_FOLDER is false
         setNextSong();
         nextSong = getNextSong();
 
@@ -212,11 +198,11 @@ public class SoundClip implements LineListener, Observer {
             playbackCompleted = false;
         } else if (type == LineEvent.Type.STOP) {
             playbackCompleted = true;
-            if(!getLastCommand().equals("stop")){
+            if (!getLastCommand().equals("stop")) {
                 notifySubscribers();
                 return;
             }
-            mainClip.interrupt();
+            mainClipThread.interrupt();
             audioClip.close();
         }
     }
@@ -257,16 +243,20 @@ public class SoundClip implements LineListener, Observer {
         }
     }
 
-    private int generateID() {
-        return new SecureRandom().nextInt(new Random().nextInt(Integer.MAX_VALUE));
-    }
-
     public String getDefaultFolder() {
         return fileController.getDefaultFolder();
     }
 
-    public void setDefaultFolder(String path) {
-        fileController.setDefaultFolder(path);
+    //TODO: Test it
+    public boolean setDefaultFolder(String path) {
+        if (!playbackCompleted) {
+            stop();
+            if (!mainClipThread.isInterrupted()) {
+                mainClipThread.interrupt();
+            }
+        }
+
+        return fileController.setDefaultFolder(path);
     }
 
     public String getPreviousSong() {
@@ -310,6 +300,7 @@ public class SoundClip implements LineListener, Observer {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
+            // DO NOTHING
         }
     }
 
@@ -317,8 +308,59 @@ public class SoundClip implements LineListener, Observer {
         return lastCommand = controller.getLastCommand();
     }
 
-    public Controller getController() {
-        return controller;
+    public boolean isLoopOverFolder() {
+        return Flag.LOOP_OVER_FOLDER;
+    }
+
+    public void setLoopOverFolder(boolean value) {
+        Flag.LOOP_OVER_FOLDER = value;
+    }
+
+    public boolean isLoopOverClip() {
+        return Flag.LOOP_OVER_CLIP;
+    }
+
+    public void setLoopOverClip(boolean value) {
+        Flag.LOOP_OVER_CLIP = value;
+    }
+
+    public void setProperties(ClipQueue queue, SoundClip clip) {
+        controller.setProperties(queue, clip);
+    }
+
+    public void setClipIndexParam(int index){
+        Flag.Param.CLIP_INDEX = index;
+    }
+
+    public void setClipNameParam(String name){
+        Flag.Param.CLIP_NAME = name;
+    }
+
+    public int getClipIndexParam(int index){
+        return Flag.Param.CLIP_INDEX;
+    }
+
+    public String getClipNameParam(String name){
+        return Flag.Param.CLIP_NAME;
+    }
+
+    public boolean isPlaybackCompleted() {
+        return playbackCompleted;
+    }
+
+    private static class Flag {
+        @BooleanFlag
+        private static boolean LOOP_OVER_FOLDER = true;
+        @BooleanFlag
+        private static boolean LOOP_OVER_CLIP = false;
+
+
+        private static class Param{
+            @FlagParam
+            private static int CLIP_INDEX;
+            @FlagParam
+            private static String CLIP_NAME;
+        }
     }
 
     private static class Wrapper {

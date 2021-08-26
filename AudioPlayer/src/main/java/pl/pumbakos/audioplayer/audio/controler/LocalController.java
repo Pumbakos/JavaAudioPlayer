@@ -1,6 +1,7 @@
 package pl.pumbakos.audioplayer.audio.controler;
 
 import org.jetbrains.annotations.NotNull;
+import pl.pumbakos.audioplayer.audio.exception.RegexNotMatchesException;
 import pl.pumbakos.audioplayer.audio.resources.CliError;
 import pl.pumbakos.audioplayer.audio.resources.Command;
 import pl.pumbakos.audioplayer.audio.resources.CommandFlag;
@@ -14,21 +15,45 @@ import static pl.pumbakos.audioplayer.audio.resources.Command.valueOf;
 public class LocalController extends Controller {
     private static final byte SINGLE_COMMAND_PROCESSING = 0;
     private static final byte FLAGGED_COMMAND_PROCESSING = 1;
-    List<String> commands;
-    private Map<Integer, String> commandMap = new HashMap<>();
     private Stack<String> commandStack = new Stack<>();
-    private int folderParamIndex;
-    private int loopOverFolderParamIndex;
     private volatile String primaryCommand;
 
     public LocalController() {
         super();
     }
 
-    public static void main(String[] args) {
-        LocalController lc = new LocalController();
-        lc.chooseExecuteMethod("folder -t -a -c D:\\Desktop\\CODE\\JAVA\\AudioPlayer\\music\\wav\\");
-//        System.out.println(s);
+//    public static void main(String[] args) {
+//
+//        LocalController lc = new LocalController();
+//        lc.chooseExecuteMethod("play -l");
+//    }
+
+    @Override
+    public void menu() {
+        System.out.println("\t\t\tMENU");
+        System.out.println("Enter 'play' to start playing.");
+        System.out.println("Enter 'stop' to stop playing.");
+        System.out.println("Enter 'pause' to pause.");
+        System.out.println("Enter 'resume' to resume.");
+        System.out.println("Enter 'next' for next song.");
+        System.out.println("Enter 'previous' for previous song.");
+        System.out.println("Enter 'list' for listing all songs.");
+        System.out.println("Enter 'folder -c' to change default folder.");
+        System.out.println("Enter 'help' for help.");
+    }
+
+    @Override
+    public void cmd() {
+        menu();
+        clip.list();
+        clip.setCurrentSong();
+        lastCommand = "play";
+        do {
+            lastCommand = command;
+            System.out.print(">> ");
+            command = scanner.nextLine().toLowerCase();
+            chooseExecuteMethod(command);
+        } while (true);
     }
 
     /**
@@ -38,7 +63,7 @@ public class LocalController extends Controller {
      * @param command command that you enter in CLI
      * @return temporary return
      */
-    private int fragmentCommand(@NotNull String command) {
+    private int fragmentCommand(@NotNull String command) throws RegexNotMatchesException {
         String[] fragmentedCommand = command.split("\\s");
 
         if (fragmentedCommand.length == 1) {
@@ -46,24 +71,40 @@ public class LocalController extends Controller {
         } else {
             for (String s : fragmentedCommand) {
                 if (!s.matches(Regex.COMMAND_REGEX)) {
-                    return CliError.SYNTAX_ERROR.getErrorCode();
+                    throw new RegexNotMatchesException(CliError.SYNTAX_ERROR.toString());
                 }
             }
 
-            commands = Arrays.asList(fragmentedCommand);
+            List<String> commands = Arrays.asList(fragmentedCommand);
+
+            if(commandStack.empty()){
+                Iterator<String> it = commandStack.iterator();
+                while(it.hasNext()){
+                    it.next();
+                    it.remove();
+                }
+            }
 
             for (int i = 1; i < fragmentedCommand.length; ++i) {
                 commandStack.push(fragmentedCommand[i].replace("--", "").replace("-", ""));
             }
 
-            primaryCommand = commands.get(0);
+            this.primaryCommand = commands.get(0);
 
             return FLAGGED_COMMAND_PROCESSING;
         }
     }
 
-    private void chooseExecuteMethod(String command) {
-        int whatToDo = fragmentCommand(command);
+    private boolean chooseExecuteMethod(String command) {
+        int whatToDo;
+
+        try {
+            whatToDo = fragmentCommand(command);
+        } catch (RegexNotMatchesException e) {
+            e.printStackTrace();
+            return false;
+        }
+
         if (whatToDo == SINGLE_COMMAND_PROCESSING) {
             executeCommand(command);
         } else {
@@ -74,29 +115,32 @@ public class LocalController extends Controller {
                 System.out.println(CliError.CANNOT_RESOLVE_GIVEN_PARAMETER);
             }
         }
+
+        return true;
     }
 
     private void executeCommand(String command) {
-        switch (command) {
-            case "play" -> {
+        Command cmd = toCommand(command);
+        switch (Objects.requireNonNull(cmd)) {
+            case PLAY-> {
                 clip.play();
             }
-            case "stop", "exit" -> {
+            case STOP, EXIT -> {
                 clip.stop();
             }
-            case "next" -> {
+            case NEXT -> {
                 clip.next();
             }
-            case "previous" -> {
+            case PREVIOUS -> {
                 clip.previous();
             }
-            case "resume" -> {
+            case RESUME -> {
                 clip.resume();
             }
-            case "pause" -> {
+            case PAUSE -> {
                 clip.pause();
             }
-            case "list" -> {
+            case LIST -> {
                 clip.list();
             }
             default -> help();
@@ -108,11 +152,41 @@ public class LocalController extends Controller {
      * @see Command
      */
     private void executeCommand(Stack<String> stack) throws NullPointerException {
-        Command command = toCommand(primaryCommand);
-//        System.out.println(command);
+        Command command = toCommand(this.primaryCommand);
         switch (Objects.requireNonNull(command)) {
             case PLAY: {
-                clip.play();
+                Iterator<String> iterator = stack.iterator();
+
+                while (iterator.hasNext()) {
+                    String cmd = iterator.next();
+                    System.out.println("STOS" + stack);
+
+                    switch (cmd) {
+                        case CommandFlag.CHOOSE, CommandFlag.Short.CHOOSE: {
+                            int index;
+                            try {
+                                index = Integer.parseInt(stack.pop());
+                                if (!clip.isPlaybackCompleted()) {
+                                    clip.stop();
+                                }
+
+                                clip.getFileController().setCurrentSong(index + 1);
+                            } catch (NumberFormatException e) {
+                                System.err.println(CliError.WRONG_PARAMETER_ERROR);
+                            }
+                            clip.play();
+                        }
+
+                        case CommandFlag.LOOP_OVER, CommandFlag.Short.LOOP_OVER: {
+                            System.out.println("TOGGLED LOOP FLAG");
+                            clip.setLoopOverClip(true);
+                        }
+
+                        default:
+                            System.out.println(CliError.NO_FLAG_FOUND(cmd));
+                            break;
+                    }
+                }
             }
             case STOP: {
                 clip.stop();
@@ -146,7 +220,7 @@ public class LocalController extends Controller {
 //                    System.out.println("STOS" + stack);
 
                     switch (cmd) {
-                        case CommandFlag.FOLDER_CHOOSE, CommandFlag.Short.FOLDER_CHOOSE: {
+                        case CommandFlag.CHOOSE, CommandFlag.Short.CHOOSE: {
                             String path = commandStack.pop();
                             System.out.println("FOLDER SET TO " + path);
                             clip.setDefaultFolder(path);

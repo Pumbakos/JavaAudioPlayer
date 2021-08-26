@@ -13,7 +13,7 @@ public class Main {
         clip.setProperties(queue, clip);
         clip.subscribe(queue);
 
-        clip.menu();
+//        clip.menu();
         clip.cmd();
     }
 }

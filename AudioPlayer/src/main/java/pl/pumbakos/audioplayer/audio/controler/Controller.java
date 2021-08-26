@@ -4,12 +4,12 @@ import pl.pumbakos.audioplayer.audio.player.SoundClip;
 
 import java.util.Scanner;
 
-public class Controller{
+public class Controller {
     protected final Scanner scanner = new Scanner(System.in);
     protected SoundClip clip;
     protected ClipQueue queue;
-    private volatile String command;
-    private volatile String lastCommand;
+    protected volatile String command;
+    protected volatile String lastCommand;
 
     public Controller(){}
 
