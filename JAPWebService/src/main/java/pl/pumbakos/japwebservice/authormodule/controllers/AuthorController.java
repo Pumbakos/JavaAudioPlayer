@@ -1,5 +1,6 @@
 package pl.pumbakos.japwebservice.authormodule.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import pl.pumbakos.japwebservice.authormodule.models.Author;
@@ -15,6 +16,7 @@ import static pl.pumbakos.japwebservice.authormodule.resources.EndPoint.PathVari
 public class AuthorController {
     private final AuthorService service;
 
+    @Autowired
     public AuthorController(AuthorService service) {
         this.service = service;
     }
@@ -24,12 +26,12 @@ public class AuthorController {
         return service.getAll();
     }
 
-    @GetMapping(path = ID, consumes = "application/json", produces = "application/json")
+    @GetMapping(path = ID, produces = "application/json")
     public Author get(@PathVariable(name = "id") Long id){
         return service.get(id);
     }
 
-    @PostMapping(path = ID, consumes = "application/json", produces = "application/json")
+    @PostMapping(consumes = "application/json", produces = "application/json")
     public Author save(@RequestBody Author author){
         return service.save(author);
     }
