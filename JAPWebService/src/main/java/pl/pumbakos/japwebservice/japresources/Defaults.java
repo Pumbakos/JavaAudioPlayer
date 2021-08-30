@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice.songmodule.resource;
+package pl.pumbakos.japwebservice.japresources;
 
 public class Defaults {
     public static final String DIRECTORY = System.getProperty("user.home") + "/Downloads/";

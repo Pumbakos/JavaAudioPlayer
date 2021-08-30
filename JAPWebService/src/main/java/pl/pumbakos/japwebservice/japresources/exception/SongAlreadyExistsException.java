@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice.songmodule.resource.exception;
+package pl.pumbakos.japwebservice.japresources.exception;
 
 public class SongAlreadyExistsException extends RuntimeException {
     public SongAlreadyExistsException(){}

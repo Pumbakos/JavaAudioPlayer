@@ -12,8 +12,8 @@ import pl.pumbakos.japwebservice.songmodule.services.SongService;
 import java.util.List;
 import java.util.Objects;
 
-import static pl.pumbakos.japwebservice.songmodule.resource.EndPoint.*;
-import static pl.pumbakos.japwebservice.songmodule.resource.EndPoint.PathVariable.*;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.*;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.*;
 
 @RestController
 @RequestMapping(SONG)
@@ -34,32 +34,38 @@ public class SongController {
         return service.upload(multipartFiles);
     }
 
-    @PutMapping(path = ID, consumes = "application/json", produces = "text/plain")
+    @PutMapping(path = ID,
+            consumes = "application/json", produces = "text/plain")
     public ResponseEntity<String> update(@RequestBody Song song, @PathVariable(name = "id") Long id){
         return service.update(song, id);
     }
 
-    @GetMapping(path = FILENAME, produces = "application/json")
+    @GetMapping(path = FILENAME,
+            produces = "application/json")
     public ResponseEntity<Object> download(@PathVariable("filename") String filename) {
         return service.download(filename);
     }
 
-    @GetMapping(path = INFO + FILENAME, produces = "application/json")
+    @GetMapping(path = INFO + FILENAME,
+            produces = "application/json")
     public ResponseEntity<Song> get(@PathVariable("filename") String filename) {
         return service.info(filename);
     }
 
-    @GetMapping(path = SIZE + FILENAME, produces = "text/plain")
+    @GetMapping(path = SIZE + FILENAME,
+            produces = "text/plain")
     public ResponseEntity<Long> getFileSize(@PathVariable("filename") String filename) {
         return service.getFileSize(filename);
     }
 
-    @GetMapping(path = ALL, produces = "application/json")
+    @GetMapping(path = ALL,
+            produces = "application/json")
     public String getTitles() {
         return service.getTitles();
     }
 
-    @GetMapping(path = INFO + ALL, produces = "application/json")
+    @GetMapping(path = INFO + ALL,
+            produces = "application/json")
     public List<Song> getAll() {
         return service.getAll();
     }

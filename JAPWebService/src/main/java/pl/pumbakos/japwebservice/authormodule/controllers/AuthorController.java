@@ -8,8 +8,9 @@ import pl.pumbakos.japwebservice.authormodule.services.AuthorService;
 
 import java.util.List;
 
-import static pl.pumbakos.japwebservice.authormodule.resources.EndPoint.*;
-import static pl.pumbakos.japwebservice.authormodule.resources.EndPoint.PathVariable.*;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.*;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.*;
+
 
 @RestController
 @RequestMapping(AUTHOR)

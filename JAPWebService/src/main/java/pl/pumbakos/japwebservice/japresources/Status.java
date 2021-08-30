@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice.songmodule.resource;
+package pl.pumbakos.japwebservice.japresources;
 
 public class Status {
     public static final byte BAD_EXTENSION = -1;

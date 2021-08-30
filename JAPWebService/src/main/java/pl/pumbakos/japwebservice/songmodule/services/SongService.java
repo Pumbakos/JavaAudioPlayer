@@ -1,7 +1,6 @@
 package pl.pumbakos.japwebservice.songmodule.services;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -16,8 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.pumbakos.japwebservice.albummodule.AlbumRepository;
 import pl.pumbakos.japwebservice.songmodule.SongRepository;
 import pl.pumbakos.japwebservice.songmodule.models.Song;
-import pl.pumbakos.japwebservice.songmodule.resource.Extension;
-import pl.pumbakos.japwebservice.songmodule.resource.Status;
+import pl.pumbakos.japwebservice.japresources.Extension;
+import pl.pumbakos.japwebservice.japresources.Status;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

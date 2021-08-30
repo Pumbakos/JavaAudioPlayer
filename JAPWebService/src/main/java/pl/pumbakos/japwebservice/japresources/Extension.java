@@ -1,4 +1,4 @@
-package pl.pumbakos.japwebservice.songmodule.resource;
+package pl.pumbakos.japwebservice.japresources;
 
 public class Extension {
     public static final String WAV = ".wav";
