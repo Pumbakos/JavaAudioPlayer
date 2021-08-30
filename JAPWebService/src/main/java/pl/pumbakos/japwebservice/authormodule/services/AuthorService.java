@@ -2,8 +2,10 @@ package pl.pumbakos.japwebservice.authormodule.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.pumbakos.japwebservice.albummodule.AlbumRepository;
 import pl.pumbakos.japwebservice.authormodule.AuthorRepository;
 import pl.pumbakos.japwebservice.authormodule.models.Author;
+import pl.pumbakos.japwebservice.songmodule.SongRepository;
 
 import javax.persistence.Basic;
 import java.lang.reflect.Field;
@@ -13,10 +15,14 @@ import java.util.Optional;
 @Service
 public class AuthorService {
     private final AuthorRepository repository;
+    private final AlbumRepository albumRepository;
+    private final SongRepository songRepository;
 
     @Autowired
-    public AuthorService(AuthorRepository repository) {
+    public AuthorService(AuthorRepository repository, AlbumRepository albumRepository, SongRepository songRepository) {
         this.repository = repository;
+        this.albumRepository = albumRepository;
+        this.songRepository = songRepository;
     }
 
     public List<Author>getAll(){

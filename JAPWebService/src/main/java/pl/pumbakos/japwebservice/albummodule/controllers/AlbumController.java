@@ -17,14 +17,12 @@ public class AlbumController {
         this.service = service;
     }
 
-    @GetMapping(path = "/all",
-            consumes = "application/json", produces = "application/json")
+    @GetMapping(path = "/all", produces = "application/json")
     public List<Album> getAll(){
         return service.getAll();
     }
 
-    @GetMapping(path = "/{id}",
-            consumes = "application/json", produces = "application/json")
+    @GetMapping(path = "/{id}", produces = "application/json")
     public Album get(@PathVariable(name = "id") Long id){
         return service.get(id);
     }

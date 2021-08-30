@@ -39,23 +39,28 @@ public class SongController {
         return service.update(song, id);
     }
 
-    @GetMapping(path = FILENAME, consumes = "application/json", produces = "text/plain")
+    @GetMapping(path = FILENAME, produces = "application/json")
     public ResponseEntity<Object> download(@PathVariable("filename") String filename) {
         return service.download(filename);
     }
 
-    @GetMapping(path = INFO + FILENAME, consumes = "text/plain", produces = "text/plain")
+    @GetMapping(path = INFO + FILENAME, produces = "application/json")
     public ResponseEntity<Song> get(@PathVariable("filename") String filename) {
         return service.info(filename);
     }
 
-    @GetMapping(path = SIZE + FILENAME, consumes = "text/plain", produces = "text/plain")
+    @GetMapping(path = SIZE + FILENAME, produces = "text/plain")
     public ResponseEntity<Long> getFileSize(@PathVariable("filename") String filename) {
         return service.getFileSize(filename);
     }
 
     @GetMapping(path = ALL, produces = "application/json")
-    public List<String> getTitles() {
+    public String getTitles() {
         return service.getTitles();
+    }
+
+    @GetMapping(path = INFO + ALL, produces = "application/json")
+    public List<Song> getAll() {
+        return service.getAll();
     }
 }

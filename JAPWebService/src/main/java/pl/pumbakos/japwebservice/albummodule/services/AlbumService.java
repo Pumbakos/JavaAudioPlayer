@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.pumbakos.japwebservice.albummodule.AlbumRepository;
 import pl.pumbakos.japwebservice.albummodule.models.Album;
+import pl.pumbakos.japwebservice.authormodule.AuthorRepository;
+import pl.pumbakos.japwebservice.songmodule.SongRepository;
 
 import javax.persistence.Basic;
 import java.lang.reflect.Field;
@@ -13,10 +15,14 @@ import java.util.Optional;
 @Service
 public class AlbumService {
     private final AlbumRepository repository;
+    private final AuthorRepository authorRepository;
+    private final SongRepository songRepository;
 
     @Autowired
-    public AlbumService(AlbumRepository repository) {
+    public AlbumService(AlbumRepository repository, AuthorRepository authorRepository, SongRepository songRepository) {
         this.repository = repository;
+        this.authorRepository = authorRepository;
+        this.songRepository = songRepository;
     }
 
     public List<Album> getAll(){
@@ -28,6 +34,8 @@ public class AlbumService {
     }
 
     public Album save(Album album){
+//        songRepository.saveAll(album.getSongs());
+//        authorRepository.saveAll(album.getAuthors());
         return repository.save(album);
     }
 
