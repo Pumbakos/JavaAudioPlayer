@@ -47,6 +47,7 @@ public class AuthorService {
         Optional<Author> optionalAuthor = repository.findById(id);
         if(optionalAuthor.isPresent()){
             repository.delete(optionalAuthor.get());
+            return optionalAuthor.get();
         }
         return null;
     }

@@ -2,10 +2,12 @@ package pl.pumbakos.japwebservice.japresources;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import pl.pumbakos.japwebservice.japresources.exception.ObjectHasWrongIdException;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -64,5 +66,34 @@ public class DefaultUtils<T extends DBModel> {
             return repository.save(updatableObject);
         }
         return null;
+    }
+
+    public <S extends DBModel> void checkIfPresent(JpaRepository<S, Long> repository, S object) throws ObjectHasWrongIdException {
+        if (object == null)
+            throw new NullPointerException("Object is null");
+
+        if (object.getId() == null)
+            repository.save(object);
+
+        Optional<S> optionalObject = repository.findById(object.getId());
+        if (optionalObject.isEmpty())
+            throw new ObjectHasWrongIdException("Object " + object + "has wrong ID\nIt cannot be identified");
+    }
+
+    public <S extends DBModel> void checkIfPresents(JpaRepository<S, Long> repository, List<S> objects, Class<S> clazz) throws ObjectHasWrongIdException {
+        if (objects == null || objects.isEmpty())
+            throw new NullPointerException("List of " + clazz + " is blank or empty");
+
+        for (S object : objects) {
+            if (object == null)
+                throw new NullPointerException("Object is null");
+
+            if (object.getId() == null)
+                repository.save(object);
+
+            Optional<S> optionalObject = repository.findById(object.getId());
+            if (optionalObject.isEmpty())
+                throw new ObjectHasWrongIdException("Object " + object + " at " + object.getClass().getPackageName() + "has wrong ID\nIt cannot be identified");
+        }
     }
 }

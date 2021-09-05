@@ -40,8 +40,8 @@ public class Author extends DBModel implements Serializable {
     @Column(name = "nickname", columnDefinition = "VARCHAR(50)")
     private String nickname;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "authors")
+    @JsonIgnore
     @ToString.Exclude
     private List<Album> albums;
 
