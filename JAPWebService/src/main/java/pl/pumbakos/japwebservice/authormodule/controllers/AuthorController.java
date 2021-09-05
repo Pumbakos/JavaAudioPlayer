@@ -39,11 +39,12 @@ public class AuthorController {
     }
 
     @PutMapping(path = ID, consumes = "application/json", produces = "application/json")
-    public Author update(@RequestBody Author author, @PathVariable(name = "id") Long id){
+    public Author update(@Valid @RequestBody Author author, @PathVariable(name = "id") Long id){
         return service.update(author, id);
     }
 
-    @DeleteMapping(path = ID, consumes = "application/json", produces = "application/json")
+    @DeleteMapping(path = ID,
+            produces = "application/json")
     public Author delete(@PathVariable(name = "id") Long id){
         return service.delete(id);
     }

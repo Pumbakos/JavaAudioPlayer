@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.pumbakos.japwebservice.songmodule.models.Song;
 import pl.pumbakos.japwebservice.songmodule.services.SongService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class SongController {
 
     @PutMapping(path = ID,
             consumes = "application/json", produces = "application/json")
-    public Song update(@RequestBody Song song, @PathVariable(name = "id") Long id){
+    public Song update(@Valid @RequestBody Song song, @PathVariable(name = "id") Long id){
         return service.update(song, id);
     }
 

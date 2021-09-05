@@ -22,27 +22,32 @@ public class ProducerController {
         this.service = service;
     }
 
-    @GetMapping(path = ALL)
+    @GetMapping(path = ALL,
+            produces = "application/json")
     public List<Producer> getAll(){
         return service.getAll();
     }
 
-    @GetMapping(path = ID)
-    public Producer get(@PathVariable(name = "id") Long id){
+    @GetMapping(path = ID,
+            consumes = "application/json", produces = "application/json")
+    public Producer get(@Valid @PathVariable(name = "id") Long id){
         return service.get(id);
     }
 
-    @PostMapping()
+    @PostMapping(
+            consumes = "application/json")
     public Producer save(@Valid @RequestBody Producer producer){
         return service.save(producer);
     }
 
-    @PutMapping(path = ID)
+    @PutMapping(path = ID,
+            consumes = "application/json", produces = "application/json")
     public Producer update(@RequestBody Producer producer, @PathVariable(name = "id") Long id){
         return service.update(producer, id);
     }
 
-    @DeleteMapping(path = ID)
+    @DeleteMapping(path = ID,
+            produces = "application/json")
     public Producer delete(@PathVariable(name = "id") Long id){
         return service.delete(id);
     }

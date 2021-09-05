@@ -41,12 +41,12 @@ public class AlbumController {
 
     @PutMapping(path = ID,
             consumes = "application/json", produces = "application/json")
-    public Album update(@RequestBody Album album, @PathVariable(name = "id") Long id) {
+    public Album update(@Valid @RequestBody Album album, @PathVariable(name = "id") Long id) {
         return service.update(album, id);
     }
 
     @DeleteMapping(path = ID,
-            consumes = "application/json", produces = "application/json")
+            produces = "application/json")
     public Album delete(@PathVariable(name = "id") Long id) {
         return service.delete(id);
     }

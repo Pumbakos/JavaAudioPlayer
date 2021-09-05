@@ -47,6 +47,6 @@ public class Song extends DBModel implements Serializable {
     private List<Author> authors;
 
     @ManyToOne
-    @JoinColumn(name = "album_id", updatable = false, insertable = false)
+    @JoinColumn(name = "album_id")
     private Album album;
 }
