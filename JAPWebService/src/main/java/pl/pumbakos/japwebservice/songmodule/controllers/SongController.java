@@ -12,8 +12,12 @@ import pl.pumbakos.japwebservice.songmodule.services.SongService;
 import java.util.List;
 import java.util.Objects;
 
-import static pl.pumbakos.japwebservice.japresources.EndPoint.*;
-import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.*;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.SONG;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.ALL;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.INFO;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.SIZE;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.ID;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.FILENAME;
 
 @RestController
 @RequestMapping(SONG)

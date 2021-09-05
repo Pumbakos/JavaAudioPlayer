@@ -1,6 +1,7 @@
 package pl.pumbakos.japwebservice.songmodule.services;
 
 import com.google.gson.Gson;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -86,21 +87,11 @@ public class SongService {
         }
     }
 
+    @SneakyThrows
     public Song update(Song song, Long id) {
-        //TODO: do it with services insted of repos
-        for (Author author : song.getAuthors()) {
-            Optional<Author> byId = authorRepository.findById(author.getId());
-            if (byId.isEmpty()){
-                authorRepository.save(author);
-            }
-        }
-
-        Optional<Album> albumById = albumRepository.findById(song.getAlbum().getId());
-        if (albumById.isEmpty()){
-            albumRepository.save(song.getAlbum());
-        }
-
-        producerRepository.save(song.getAlbum().getProducer());
+        defaultUtils.checkIfPresents(authorRepository, song.getAuthors(), Author.class);
+        defaultUtils.checkIfPresent(albumRepository, song.getAlbum());
+        defaultUtils.checkIfPresent(producerRepository, song.getAlbum().getProducer());
 
         return defaultUtils.update(repository, song, id);
     }

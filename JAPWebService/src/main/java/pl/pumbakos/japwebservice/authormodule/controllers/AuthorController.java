@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import pl.pumbakos.japwebservice.authormodule.models.Author;
 import pl.pumbakos.japwebservice.authormodule.services.AuthorService;
 
+import javax.validation.Valid;
 import java.util.List;
 
-import static pl.pumbakos.japwebservice.japresources.EndPoint.*;
-import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.*;
-
+import static pl.pumbakos.japwebservice.japresources.EndPoint.ALL;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.AUTHOR;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.ID;
 
 @RestController
 @RequestMapping(AUTHOR)
@@ -33,7 +34,7 @@ public class AuthorController {
     }
 
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public Author save(@RequestBody Author author){
+    public Author save(@Valid @RequestBody Author author){
         return service.save(author);
     }
 

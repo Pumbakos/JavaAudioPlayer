@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import pl.pumbakos.japwebservice.producermodule.models.Producer;
 import pl.pumbakos.japwebservice.producermodule.services.ProducerService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static pl.pumbakos.japwebservice.japresources.EndPoint.*;
@@ -32,7 +33,7 @@ public class ProducerController {
     }
 
     @PostMapping()
-    public Producer save(@RequestBody Producer producer){
+    public Producer save(@Valid @RequestBody Producer producer){
         return service.save(producer);
     }
 

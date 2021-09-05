@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.pumbakos.japwebservice.albummodule.models.Album;
 import pl.pumbakos.japwebservice.albummodule.services.AlbumService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static pl.pumbakos.japwebservice.japresources.EndPoint.ALBUM;
@@ -34,7 +35,7 @@ public class AlbumController {
     }
 
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public Album save(@RequestBody Album album) {
+    public Album save(@Valid @RequestBody Album album) {
         return service.save(album);
     }
 
