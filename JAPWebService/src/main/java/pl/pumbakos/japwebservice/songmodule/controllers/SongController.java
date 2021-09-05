@@ -35,8 +35,8 @@ public class SongController {
     }
 
     @PutMapping(path = ID,
-            consumes = "application/json", produces = "text/plain")
-    public ResponseEntity<String> update(@RequestBody Song song, @PathVariable(name = "id") Long id){
+            consumes = "application/json", produces = "application/json")
+    public Song update(@RequestBody Song song, @PathVariable(name = "id") Long id){
         return service.update(song, id);
     }
 

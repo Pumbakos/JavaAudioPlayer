@@ -9,23 +9,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import pl.pumbakos.japwebservice.albummodule.AlbumRepository;
-import pl.pumbakos.japwebservice.songmodule.SongRepository;
-import pl.pumbakos.japwebservice.songmodule.models.Song;
+import pl.pumbakos.japwebservice.albummodule.models.Album;
+import pl.pumbakos.japwebservice.authormodule.AuthorRepository;
+import pl.pumbakos.japwebservice.authormodule.models.Author;
+import pl.pumbakos.japwebservice.japresources.DefaultUtils;
 import pl.pumbakos.japwebservice.japresources.Extension;
 import pl.pumbakos.japwebservice.japresources.Status;
+import pl.pumbakos.japwebservice.producermodule.ProducertRepository;
+import pl.pumbakos.japwebservice.songmodule.SongRepository;
+import pl.pumbakos.japwebservice.songmodule.models.Song;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,13 +42,20 @@ public class SongService {
     private static final String DIRECTORY = System.getProperty("user.home") + "/Downloads/";
     private final SongRepository repository;
     private final AlbumRepository albumRepository;
+    private final AuthorRepository authorRepository;
+    private final ProducertRepository producerRepository;
+    private final DefaultUtils<Song> defaultUtils;
     private final Gson gson;
 
     @Autowired
-    public SongService(SongRepository repository, AlbumRepository albumRepository, Gson gson) {
+    public SongService(SongRepository repository, AlbumRepository albumRepository, AuthorRepository authorRepository,
+                       ProducertRepository producerRepository, Gson gson, DefaultUtils<Song> defaultUtils) {
         this.repository = repository;
         this.albumRepository = albumRepository;
+        this.authorRepository = authorRepository;
+        this.producerRepository = producerRepository;
         this.gson = gson;
+        this.defaultUtils = defaultUtils;
     }
 
     public ResponseEntity<String> upload(List<MultipartFile> multipartFiles) {
@@ -77,45 +86,25 @@ public class SongService {
         }
     }
 
-    @Transactional
-    public ResponseEntity<String> update(Song song, Long id) {
-        albumRepository.save(song.getAlbum());
-        Optional<Song> optionalSong = repository.findById(id);
-        if (optionalSong.isPresent()) {
-            Song updatableSong = optionalSong.get();
-
-            Field[] fields = Song.class.getDeclaredFields();
-
-            for (Field field : fields) {
-                try {
-                    if (field.getName().equalsIgnoreCase("id")) {
-                        continue;
-                    }
-
-                    Field updatableSongField = updatableSong.getClass().getDeclaredField(field.getName());
-                    Field songField = song.getClass().getDeclaredField(field.getName());
-
-                    updatableSongField.setAccessible(true);
-                    songField.setAccessible(true);
-
-                    updatableSongField.set(updatableSong, songField.get(song));
-
-                    updatableSongField.setAccessible(false);
-                    songField.setAccessible(false);
-                } catch (NullPointerException | NoSuchFieldException | IllegalAccessException | DateTimeParseException e) {
-                    return ResponseEntity.badRequest().body(Status.Message.BAD_REQUEST);
-                }
+    public Song update(Song song, Long id) {
+        //TODO: do it with services insted of repos
+        for (Author author : song.getAuthors()) {
+            Optional<Author> byId = authorRepository.findById(author.getId());
+            if (byId.isEmpty()){
+                authorRepository.save(author);
             }
-            repository.save(updatableSong);
-
-            return ResponseEntity.accepted().body(Status.Message.ACCEPTED);
         }
-        return ResponseEntity.unprocessableEntity().body(Status.Message.NOT_FOUND);
+
+        Optional<Album> albumById = albumRepository.findById(song.getAlbum().getId());
+        if (albumById.isEmpty()){
+            albumRepository.save(song.getAlbum());
+        }
+
+        producerRepository.save(song.getAlbum().getProducer());
+
+        return defaultUtils.update(repository, song, id);
     }
 
-    /**
-     * @param filename - name of song in DB, it's better to use names w/o extensions
-     */
     public ResponseEntity<Object> download(String filename) {
         Optional<Song> optionalSong = repository.findByTitle(filename);
 

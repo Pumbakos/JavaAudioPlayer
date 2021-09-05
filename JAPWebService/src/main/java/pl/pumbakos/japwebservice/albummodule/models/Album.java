@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import pl.pumbakos.japwebservice.authormodule.models.Author;
+import pl.pumbakos.japwebservice.japresources.DBModel;
+import pl.pumbakos.japwebservice.producermodule.models.Producer;
 import pl.pumbakos.japwebservice.songmodule.models.Song;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -17,11 +21,12 @@ import java.util.List;
 @Setter
 @Entity
 @Table
-public class Album {
+@ToString
+public class Album extends DBModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Exclude
-    @Column(name = "album_id", columnDefinition = "INT")
+    @Column(name = "album_id", columnDefinition = "INT", unique = true, updatable = false, insertable = false)
     private Long id;
 
     @NotBlank
@@ -40,15 +45,19 @@ public class Album {
     @Column(nullable = false)
     @OneToMany(mappedBy = "album")
     @JsonIgnore
+    @ToString.Exclude
     private List<Song> songs;
-//
-//    @NotNull
-//    @Column
-//    @ManyToMany(cascade = {CascadeType.ALL})
-//    @JoinTable(
-//            name = "Author_Album",
-//            joinColumns = {@JoinColumn(name = "author.id")},
-//            inverseJoinColumns = {@JoinColumn(name = "album.id")}
-//    )
-//    private List<Author> authors;
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "AUTHOR_ALBUM",
+            joinColumns = {@JoinColumn(name = "author_id")},
+            inverseJoinColumns = {@JoinColumn(name = "album_id")}
+    )
+    @ToString.Exclude
+    private List<Author> authors;
+
+    @ManyToOne
+    @JoinColumn(name = "album_id", referencedColumnName = "id", updatable = false, insertable = false)
+    private Producer producer;
 }

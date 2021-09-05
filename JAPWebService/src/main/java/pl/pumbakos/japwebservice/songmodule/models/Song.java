@@ -1,11 +1,11 @@
 package pl.pumbakos.japwebservice.songmodule.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import pl.pumbakos.japwebservice.albummodule.models.Album;
 import pl.pumbakos.japwebservice.authormodule.models.Author;
+import pl.pumbakos.japwebservice.japresources.DBModel;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -17,11 +17,12 @@ import java.util.List;
 @Setter
 @Entity
 @Table
-public class Song implements Serializable {
+@ToString
+public class Song extends DBModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Exclude
-    @Column(name = "song_id", columnDefinition = "INT")
+    @Column(name = "song_id", columnDefinition = "INT", unique = true, updatable = false, insertable = false)
     private Long id;
 
     @NotBlank(message = "We require title not to be empty, check data you entered")
@@ -38,14 +39,14 @@ public class Song implements Serializable {
 
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
-            name = "Song_Author",
+            name = "SONG_AUTHOR",
             joinColumns = {@JoinColumn(name = "author_id")},
             inverseJoinColumns = {@JoinColumn(name = "song_id")}
     )
+    @ToString.Exclude
     private List<Author> authors;
 
-//    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "album_id")
+    @JoinColumn(name = "album_id", updatable = false, insertable = false)
     private Album album;
 }

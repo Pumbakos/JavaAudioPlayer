@@ -2,21 +2,22 @@ package pl.pumbakos.japwebservice.producermodule.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.pumbakos.japwebservice.japresources.DefaultUtils;
 import pl.pumbakos.japwebservice.producermodule.ProducertRepository;
 import pl.pumbakos.japwebservice.producermodule.models.Producer;
 
-import javax.persistence.Basic;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ProducerService {
     private final ProducertRepository repository;
+    private final DefaultUtils<Producer> producerDefaultUtils;
 
     @Autowired
-    public ProducerService(ProducertRepository repository) {
+    public ProducerService(ProducertRepository repository, DefaultUtils<Producer> producerDefaultUtils) {
         this.repository = repository;
+        this.producerDefaultUtils = producerDefaultUtils;
     }
 
     public List<Producer> getAll() {
@@ -32,40 +33,7 @@ public class ProducerService {
     }
 
     public Producer update(Producer producer, Long id) {
-        Optional<Producer> optionalProducer = repository.findById(id);
-
-        if (optionalProducer.isPresent()) {
-            Producer updatableProducer = optionalProducer.get();
-
-            Field[] fields = Producer.class.getDeclaredFields();
-
-            for (Field field : fields) {
-                try {
-                    if (field.getName().equalsIgnoreCase("id"))
-                        continue;
-
-                    Field updatableProducerField = updatableProducer.getClass().getDeclaredField(field.getName());
-                    Field producerField = producer.getClass().getDeclaredField(field.getName());
-
-                    updatableProducerField.setAccessible(true);
-                    producerField.setAccessible(true);
-
-                    if (field.getAnnotation(Basic.class) != null && producerField.get(producer) == null) {
-                        continue;
-                    }
-
-                    updatableProducerField.set(updatableProducer, producerField.get(producer));
-
-                    updatableProducerField.setAccessible(false);
-                    producerField.setAccessible(false);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    return null;
-                }
-            }
-
-            return repository.save(updatableProducer);
-        }
-        return null;
+        return producerDefaultUtils.update(repository, producer, id);
     }
 
     public Producer delete(Long id) {
