@@ -46,19 +46,19 @@ public class AlbumService {
     }
 
     @SneakyThrows
-    public Album update(Album album, Long id) {
+    public boolean update(Album album, Long id) {
         defaultUtils.checkIfPresent(producertRepository, album.getProducer());
         defaultUtils.checkIfPresents(authorRepository, album.getAuthors(), Author.class);
 
         return defaultUtils.update(repository, album, id);
     }
 
-    public Album delete(Long id) {
+    public boolean delete(Long id) {
         Optional<Album> optionalAlbum = repository.findById(id);
         if (optionalAlbum.isPresent()) {
             repository.delete(optionalAlbum.get());
-            return optionalAlbum.get();
+            return true;
         }
-        return null;
+        return false;
     }
 }

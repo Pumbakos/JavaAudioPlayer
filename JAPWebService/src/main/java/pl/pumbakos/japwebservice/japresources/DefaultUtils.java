@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class DefaultUtils<T extends DBModel> {
+public class DefaultUtils<S extends DBModel> {
     private static boolean isColumnUpdatable(Field field) {
         if (field.getAnnotation(Column.class) != null
                 && field.getAnnotation(Column.class).nullable()
@@ -26,16 +26,16 @@ public class DefaultUtils<T extends DBModel> {
      * Updates object under given ID with params from given object in given repository
      *
      * @param repository repository that extends JpaRepository
-     * @param object     object were data come from
-     * @param id         id of object in repository
-     * @return updated object
+     * @param object     object from which data is taken
+     * @param id         object ID in repository
+     * @return true if object was updated, false otherwise
      * @see JpaRepository
      */
-    public T update(JpaRepository<T, Long> repository, T object, Long id) {
-        Optional<T> optionalObject = repository.findById(id);
+    public <S extends DBModel> boolean update(JpaRepository<S, Long> repository, S object, Long id) {
+        Optional<S> optionalObject = repository.findById(id);
 
         if (optionalObject.isPresent()) {
-            T updatableObject = optionalObject.get();
+            S updatableObject = optionalObject.get();
 
             Field[] fields = object.getClass().getDeclaredFields();
 
@@ -58,14 +58,15 @@ public class DefaultUtils<T extends DBModel> {
 
                     updatableObjectField.setAccessible(false);
                     objectField.setAccessible(false);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    return null;
+                } catch (Exception e) {
+                    return false;
                 }
             }
 
-            return repository.save(updatableObject);
+            repository.save(updatableObject);
+            return true;
         }
-        return null;
+        return false;
     }
 
     public <S extends DBModel> void checkIfPresent(JpaRepository<S, Long> repository, S object) throws ObjectHasWrongIdException {

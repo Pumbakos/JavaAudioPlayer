@@ -5,15 +5,11 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import pl.pumbakos.japwebservice.albummodule.AlbumRepository;
-import pl.pumbakos.japwebservice.albummodule.models.Album;
 import pl.pumbakos.japwebservice.authormodule.AuthorRepository;
 import pl.pumbakos.japwebservice.authormodule.models.Author;
 import pl.pumbakos.japwebservice.japresources.DefaultUtils;
@@ -25,18 +21,16 @@ import pl.pumbakos.japwebservice.songmodule.models.Song;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import static java.nio.file.Files.copy;
-import static java.nio.file.Paths.get;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 
 @Service
 public class SongService {
@@ -59,16 +53,16 @@ public class SongService {
         this.defaultUtils = defaultUtils;
     }
 
-    public ResponseEntity<String> upload(List<MultipartFile> multipartFiles) {
+    public Status.Message upload(List<MultipartFile> multipartFiles) {
         try {
             for (MultipartFile file : multipartFiles) {
                 String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
                 if (!filename.endsWith(Extension.WAV)) {
-                    return ResponseEntity.badRequest().body(Status.Message.BAD_EXTENSION);
+                    return Status.Message.BAD_EXTENSION;
                 }
                 Song song = new Song();
-                song.setPath(get(DIRECTORY, filename).toAbsolutePath().normalize().toString());
+                song.setPath(Paths.get(DIRECTORY, filename).toAbsolutePath().normalize().toString());
 
                 Path fileStorage = Path.of(song.getPath());
                 copy(file.getInputStream(), fileStorage, REPLACE_EXISTING);
@@ -81,14 +75,14 @@ public class SongService {
 
                 repository.save(song);
             }
-            return ResponseEntity.ok().body(Status.Message.ACCEPTED);
+            return Status.Message.OK;
         } catch (IOException e) {
-            return ResponseEntity.noContent().build();
+            return Status.Message.NO_CONTENT;
         }
     }
 
     @SneakyThrows
-    public Song update(Song song, Long id) {
+    public boolean update(Song song, Long id) {
         defaultUtils.checkIfPresents(authorRepository, song.getAuthors(), Author.class);
         defaultUtils.checkIfPresent(albumRepository, song.getAlbum());
         defaultUtils.checkIfPresent(producerRepository, song.getAlbum().getProducer());
@@ -96,47 +90,39 @@ public class SongService {
         return defaultUtils.update(repository, song, id);
     }
 
-    public ResponseEntity<Object> download(String filename) {
+    public Resource download(String filename) {
         Optional<Song> optionalSong = repository.findByTitle(filename);
 
-        Resource resource;
         Path filePath;
         try {
             if (optionalSong.isPresent())
                 filePath = Path.of(optionalSong.get().getPath());
             else
-                return ResponseEntity.notFound().build();
+                return null;
 
             if (!Files.exists(filePath)) {
-                throw new FileNotFoundException(filename + " was not found on the server");
+                return null;
             }
 
-            resource = new UrlResource(filePath.toUri());
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.add("File-Name", filename);
-            httpHeaders.add(CONTENT_DISPOSITION, "attachment;File-Name=" + resource.getFilename());
-
-            return ResponseEntity.ok().contentType(MediaType.parseMediaType(Files.probeContentType(filePath)))
-                    .headers(httpHeaders).body(resource);
-        } catch (InvalidPathException | MalformedURLException e) {
-            return ResponseEntity.of(Optional.of(Status.Message.INVALID_TITLE));
-        } catch (IOException e) {
-            return ResponseEntity.of(Optional.of(HttpStatus.INTERNAL_SERVER_ERROR));
+            return new UrlResource(filePath.toUri());
+        } catch (InvalidPathException | IOException e) {
+            return null;
         }
     }
 
-    public ResponseEntity<Long> getFileSize(String filename) {
+    public Long getFileSize(String filename) {
         String trimmedFilename = filename.replace('_', ' ');
-        return ResponseEntity.ok().body(repository.findSongSizeByName(trimmedFilename).orElse((long) Status.NO_CONTENT));
+        Optional<Long> songSizeByName = repository.findSongSizeByName(trimmedFilename);
+        return songSizeByName.orElseGet(Status.INVALID_TITLE::getCode);
     }
 
     public String getTitles() {
         return gson.toJson(repository.findAllByTitle());
     }
 
-    public ResponseEntity<Song> info(String filename) {
+    public Song get(String filename) {
         Optional<Song> optionalSong = repository.findByTitle(filename);
-        return optionalSong.map(song -> ResponseEntity.accepted().body(song)).orElseGet(() -> ResponseEntity.notFound().build());
+        return optionalSong.orElse(null);
     }
 
     public List<Song> getAll() {

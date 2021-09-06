@@ -32,16 +32,16 @@ public class ProducerService {
         return repository.save(producer);
     }
 
-    public Producer update(Producer producer, Long id) {
+    public boolean update(Producer producer, Long id) {
         return producerDefaultUtils.update(repository, producer, id);
     }
 
-    public Producer delete(Long id) {
+    public boolean delete(Long id) {
         Optional<Producer> byId = repository.findById(id);
         if(byId.isPresent()){
             repository.delete(byId.get());
-            return byId.get();
+            return true;
         }
-        return null;
+        return false;
     }
 }

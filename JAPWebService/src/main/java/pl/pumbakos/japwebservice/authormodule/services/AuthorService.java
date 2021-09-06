@@ -39,16 +39,16 @@ public class AuthorService {
         return repository.save(author);
     }
 
-    public Author update(Author author, Long id){
+    public boolean update(Author author, Long id){
         return defaultUtils.update(repository, author, id);
     }
 
-    public Author delete(Long id){
+    public boolean delete(Long id){
         Optional<Author> optionalAuthor = repository.findById(id);
         if(optionalAuthor.isPresent()){
             repository.delete(optionalAuthor.get());
-            return optionalAuthor.get();
+            return true;
         }
-        return null;
+        return false;
     }
 }
