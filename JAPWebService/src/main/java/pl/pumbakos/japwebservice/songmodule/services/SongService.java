@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +18,6 @@ import pl.pumbakos.japwebservice.producermodule.ProducertRepository;
 import pl.pumbakos.japwebservice.songmodule.SongRepository;
 import pl.pumbakos.japwebservice.songmodule.models.Song;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -53,13 +51,13 @@ public class SongService {
         this.defaultUtils = defaultUtils;
     }
 
-    public Status.Message upload(List<MultipartFile> multipartFiles) {
+    public String upload(List<MultipartFile> multipartFiles) {
         try {
             for (MultipartFile file : multipartFiles) {
                 String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
                 if (!filename.endsWith(Extension.WAV)) {
-                    return Status.Message.BAD_EXTENSION;
+                    return Status.Message.BAD_EXTENSION.toString();
                 }
                 Song song = new Song();
                 song.setPath(Paths.get(DIRECTORY, filename).toAbsolutePath().normalize().toString());
@@ -75,9 +73,9 @@ public class SongService {
 
                 repository.save(song);
             }
-            return Status.Message.OK;
+            return Status.Message.OK.toString();
         } catch (IOException e) {
-            return Status.Message.NO_CONTENT;
+            return Status.Message.NO_CONTENT.toString();
         }
     }
 

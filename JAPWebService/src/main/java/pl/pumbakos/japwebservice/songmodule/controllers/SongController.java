@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static pl.pumbakos.japwebservice.japresources.EndPoint.*;
@@ -36,22 +37,26 @@ public class SongController {
         this.service = service;
     }
 
+    //FIXME
     @PostMapping(consumes = "multipart/form-data", produces = "text/plain")
-    public ResponseEntity<HttpStatus> upload(@RequestParam("files") List<MultipartFile> multipartFiles) {
+    public ResponseEntity<String> upload(@RequestParam("files") List<MultipartFile> multipartFiles) {
         String filename = StringUtils.cleanPath(Objects.requireNonNull(multipartFiles.get(0).getOriginalFilename()));
         if (multipartFiles.size() == 1 && filename.isBlank()) {
             return ResponseEntity.noContent().build();
         }
 
-        Status.Message message = service.upload(multipartFiles);
+//        HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.add("Content-Type", "multipart/form-data");
+
+        String message = service.upload(multipartFiles);
         switch (message) {
-            case OK -> {
-                return ResponseEntity.ok(HttpStatus.OK);
+            case "OK"-> {
+                return ResponseEntity.ok(Status.Message.OK.toString());
             }
-            case BAD_EXTENSION -> {
+            case "BAD_EXTENSION"-> {
                 return ResponseEntity.unprocessableEntity().build();
             }
-            case NO_CONTENT -> {
+            case "NO_CONTENT" -> {
                 return ResponseEntity.noContent().build();
             }
         }
