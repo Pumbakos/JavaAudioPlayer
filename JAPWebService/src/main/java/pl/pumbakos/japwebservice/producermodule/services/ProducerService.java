@@ -3,6 +3,7 @@ package pl.pumbakos.japwebservice.producermodule.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.pumbakos.japwebservice.japresources.DefaultUtils;
+import pl.pumbakos.japwebservice.producermodule.ProducerNotFoundException;
 import pl.pumbakos.japwebservice.producermodule.ProducertRepository;
 import pl.pumbakos.japwebservice.producermodule.models.Producer;
 
@@ -25,7 +26,7 @@ public class ProducerService {
     }
 
     public Producer get(Long id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id).orElseThrow(() -> new ProducerNotFoundException(id));
     }
 
     public Producer save(Producer producer) {
@@ -42,6 +43,6 @@ public class ProducerService {
             repository.delete(byId.get());
             return true;
         }
-        return false;
+        throw new ProducerNotFoundException(id);
     }
 }

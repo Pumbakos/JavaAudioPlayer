@@ -11,11 +11,11 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static pl.pumbakos.japwebservice.japresources.EndPoint.ALL;
-import static pl.pumbakos.japwebservice.japresources.EndPoint.PRODUCER;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.PRODUCERS;
 import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.ID;
 
 @RestController
-@RequestMapping(path = PRODUCER)
+@RequestMapping(path = PRODUCERS)
 public class ProducerController {
     private final ProducerService service;
 
@@ -24,36 +24,37 @@ public class ProducerController {
         this.service = service;
     }
 
-    @GetMapping(path = ALL,
-            produces = "application/json")
+    @GetMapping(path = ALL, produces = "application/json")
     public ResponseEntity<List<Producer>> getAll() {
         List<Producer> all = service.getAll();
-        return all == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(all);
+        return all == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(all);
     }
 
-    @GetMapping(path = ID,
-            consumes = "application/json", produces = "application/json")
+    @GetMapping(path = ID, consumes = "application/json", produces = "application/json")
     public ResponseEntity<Producer> get(@Valid @PathVariable(name = "id") Long id) {
         Producer producer = service.get(id);
-        return producer == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(producer);
+        return producer == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(producer);
     }
 
-    @PostMapping(
-            consumes = "application/json")
-    public ResponseEntity<HttpStatus> save(@Valid @RequestBody Producer producer) {
-        service.save(producer);
-        return ResponseEntity.ok(HttpStatus.CREATED);
+    @PostMapping(consumes = "application/*")
+    public ResponseEntity<String> save(@Valid @RequestBody Producer producer) {
+        //TODO: make return CREATED
+        return service.save(producer) == null ?
+                new ResponseEntity<>("Check data you have entered.", HttpStatus.BAD_REQUEST) :
+                new ResponseEntity<>("Saved successfully.", HttpStatus.OK);
     }
 
-    @PutMapping(path = ID,
-            consumes = "application/json", produces = "application/json")
-    public ResponseEntity<HttpStatus> update(@RequestBody Producer producer, @PathVariable(name = "id") Long id) {
-        return service.update(producer, id) ? ResponseEntity.ok(HttpStatus.OK) : ResponseEntity.notFound().build();
+    @PutMapping(path = ID, consumes = "application/json", produces = "application/json")
+    public ResponseEntity<String> update(@RequestBody Producer producer, @PathVariable(name = "id") Long id) {
+        return service.update(producer, id) ?
+                new ResponseEntity<>("Updated successfully.", HttpStatus.OK) :
+                new ResponseEntity<>("Check data you have entered.", HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping(path = ID,
-            produces = "application/json")
-    public ResponseEntity<HttpStatus> delete(@PathVariable(name = "id") Long id) {
-        return service.delete(id) ? ResponseEntity.ok(HttpStatus.OK) : ResponseEntity.notFound().build();
+    @DeleteMapping(path = ID, produces = "application/json")
+    public ResponseEntity<String> delete(@PathVariable(name = "id") Long id) {
+        return service.delete(id) ?
+                new ResponseEntity<>("Deleted successfully.", HttpStatus.OK) :
+                new ResponseEntity<>("Producer not found.", HttpStatus.NOT_FOUND);
     }
 }
