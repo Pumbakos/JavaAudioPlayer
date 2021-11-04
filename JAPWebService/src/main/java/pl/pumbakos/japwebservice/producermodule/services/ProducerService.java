@@ -3,7 +3,7 @@ package pl.pumbakos.japwebservice.producermodule.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.pumbakos.japwebservice.japresources.DefaultUtils;
-import pl.pumbakos.japwebservice.producermodule.ProducerNotFoundException;
+import pl.pumbakos.japwebservice.japresources.exception.ProducerNotFoundException;
 import pl.pumbakos.japwebservice.producermodule.ProducertRepository;
 import pl.pumbakos.japwebservice.producermodule.models.Producer;
 

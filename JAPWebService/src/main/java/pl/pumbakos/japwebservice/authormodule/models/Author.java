@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.ToString;
 import pl.pumbakos.japwebservice.albummodule.models.Album;
 import pl.pumbakos.japwebservice.japresources.DBModel;
+import pl.pumbakos.japwebservice.japresources.DateFormat;
+import pl.pumbakos.japwebservice.japresources.JAPDate;
 import pl.pumbakos.japwebservice.songmodule.models.Song;
 
 import javax.persistence.*;
@@ -25,7 +27,7 @@ public class Author extends DBModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Exclude
-    @Column(name = "author_id", columnDefinition = "INT", unique = true, updatable = false, insertable = false)
+    @Column(name = "author_id", columnDefinition = "INT", unique = true)
     private Long id;
 
     @NotBlank
@@ -47,7 +49,7 @@ public class Author extends DBModel implements Serializable {
 
     @NotNull
     @Column(nullable = false, name = "date_of_birth", columnDefinition = "DATETIME")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonFormat(pattern = DateFormat.ISO)
     private Date dateOfBirth;
 
     @ManyToMany(mappedBy = "authors")

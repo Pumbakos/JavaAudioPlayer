@@ -1,11 +1,9 @@
 package pl.pumbakos.japwebservice.authormodule.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.PathVariable;
 import pl.pumbakos.japwebservice.authormodule.models.Author;
 import pl.pumbakos.japwebservice.authormodule.services.AuthorService;
 
@@ -13,11 +11,11 @@ import javax.validation.Valid;
 import java.util.List;
 
 import static pl.pumbakos.japwebservice.japresources.EndPoint.ALL;
-import static pl.pumbakos.japwebservice.japresources.EndPoint.AUTHOR;
+import static pl.pumbakos.japwebservice.japresources.EndPoint.AUTHORS;
 import static pl.pumbakos.japwebservice.japresources.EndPoint.PathVariable.ID;
 
 @RestController
-@RequestMapping(AUTHOR)
+@RequestMapping(AUTHORS)
 public class AuthorController {
     private final AuthorService service;
 
@@ -39,9 +37,11 @@ public class AuthorController {
     }
 
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<HttpStatus> save(@Valid @RequestBody Author author){
-        service.save(author);
-        return ResponseEntity.ok(HttpStatus.CREATED);
+    public ResponseEntity<String> save(@Valid @RequestBody Author author){
+        //TODO: make it return CREATED status
+        return service.save(author) == null ?
+                new ResponseEntity<>("Check data you have entered.", HttpStatus.BAD_REQUEST) :
+                new ResponseEntity<>("Author created successfully.", HttpStatus.OK);
     }
 
     @PutMapping(path = ID, consumes = "application/json", produces = "application/json")

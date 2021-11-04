@@ -48,8 +48,7 @@ public class ProducerControllerTest {
 
         Mockito.when(controller.getAll()).thenReturn(ResponseEntity.ok(producers));
 
-        String contentAsString = mock.perform(get("/producers/all")
-                        .contentType(MediaType.APPLICATION_JSON))
+        String contentAsString = mock.perform(get("/producers/all"))
                 .andReturn().getResponse().getContentAsString();
 
         List<Producer> resultVacation = mapper.readValue(contentAsString, new TypeReference<>() {
@@ -65,8 +64,7 @@ public class ProducerControllerTest {
     public void getAllEmptyProducersList() {
         Mockito.when(controller.getAll()).thenReturn(ResponseEntity.noContent().build());
 
-        int status = mock.perform(get("/producers/all")
-                        .contentType(MediaType.APPLICATION_JSON))
+        int status = mock.perform(get("/producers/all"))
                 .andReturn().getResponse().getStatus();
 
         Assertions.assertEquals(HttpStatus.NO_CONTENT.value(), status);
@@ -74,8 +72,8 @@ public class ProducerControllerTest {
 
     @SneakyThrows
     @Test
-    @DisplayName("GET empty producer")
-    public void getEmptyProducer() {
+    @DisplayName("GET not existing producer")
+    public void getNotExistingProducer() {
         Mockito.when(controller.get(Mockito.anyLong())).thenReturn(ResponseEntity.notFound().build());
 
         int status = mock.perform(get("/producers/1")
@@ -87,19 +85,17 @@ public class ProducerControllerTest {
 
     @SneakyThrows
     @Test
-    @DisplayName("GET complete producer")
-    public void getCompleteProducer() {
+    @DisplayName("GET existing producer")
+    public void getExistingProducer() {
         Producer completeProducer = ProducerGenerator.createCompleteProducer();
 
         Mockito.when(controller.get(Mockito.anyLong())).thenReturn(ResponseEntity.ok(completeProducer));
 
-        String contentAsString = mock.perform(get("/producers/1")
+        int status = mock.perform(get("/producers/1")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse().getContentAsString();
+                .andReturn().getResponse().getStatus();
 
-        Producer resultVacation = mapper.readValue(contentAsString, Producer.class);
-
-        Assertions.assertEquals(completeProducer.getId(), resultVacation.getId());
+        Assertions.assertEquals(HttpStatus.OK.value(), status);
     }
 
     @SneakyThrows
@@ -138,7 +134,7 @@ public class ProducerControllerTest {
 
     @SneakyThrows
     @Test
-    @DisplayName("POST complete producer")
+    @DisplayName("POST new producer")
     public void postCompleteProducer() {
         Producer completeProducer = ProducerGenerator.createCompleteProducer();
         String json = gson.toJson(completeProducer);
@@ -155,25 +151,59 @@ public class ProducerControllerTest {
 
     @SneakyThrows
     @Test
-    @DisplayName("PUT - update producer with blank data")
+    @DisplayName("PUT - update existing producer with blank data")
     public void updateWithBlankData() {
         Producer blankProducer = ProducerGenerator.createBlankProducer();
         String json = gson.toJson(blankProducer);
 
-        Mockito.when(controller.update(Mockito.any(Producer.class), Mockito.anyLong())).thenReturn(ResponseEntity.notFound().build());
+        Mockito.when(controller.update(Mockito.any(Producer.class), Mockito.anyLong())).thenReturn(ResponseEntity.badRequest().build());
 
         int status = mock.perform(put("/producers/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andReturn().getResponse().getStatus();
 
-        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), status);
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), status);
     }
 
     @SneakyThrows
     @Test
-    @DisplayName("PUT - update producer with empty data")
+    @DisplayName("PUT - update existing producer with empty data")
     public void updateWithEmptyData() {
+        Producer emptyProducer = ProducerGenerator.createEmptyProducer();
+        String json = gson.toJson(emptyProducer);
+
+        Mockito.when(controller.update(Mockito.any(Producer.class), Mockito.anyLong())).thenReturn(ResponseEntity.badRequest().build());
+
+        int status = mock.perform(put("/producers/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andReturn().getResponse().getStatus();
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), status);
+    }
+
+    @SneakyThrows
+    @Test
+    @DisplayName("PUT - update existing producer with correct data")
+    public void updateWithCorrectData() {
+        Producer completeProducer = ProducerGenerator.createCompleteProducer();
+        String json = gson.toJson(completeProducer);
+
+        Mockito.when(controller.update(Mockito.any(Producer.class), Mockito.anyLong())).thenReturn(ResponseEntity.ok().build());
+
+        int status = mock.perform(put("/producers/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andReturn().getResponse().getStatus();
+
+        Assertions.assertEquals(HttpStatus.OK.value(), status);
+    }
+
+    @SneakyThrows
+    @Test
+    @DisplayName("PUT - update not existing producer with empty data")
+    public void updateNotExistingWithEmptyData() {
         Producer emptyProducer = ProducerGenerator.createEmptyProducer();
         String json = gson.toJson(emptyProducer);
 
@@ -189,19 +219,19 @@ public class ProducerControllerTest {
 
     @SneakyThrows
     @Test
-    @DisplayName("PUT - update producer with correct data")
-    public void updateWithCorrectData() {
+    @DisplayName("PUT - update not existing producer with correct data")
+    public void updateExistingWithCorrectData() {
         Producer completeProducer = ProducerGenerator.createCompleteProducer();
         String json = gson.toJson(completeProducer);
 
-        Mockito.when(controller.update(Mockito.any(Producer.class), Mockito.anyLong())).thenReturn(ResponseEntity.ok().build());
+        Mockito.when(controller.update(Mockito.any(Producer.class), Mockito.anyLong())).thenReturn(ResponseEntity.notFound().build());
 
         int status = mock.perform(put("/producers/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andReturn().getResponse().getStatus();
 
-        Assertions.assertEquals(HttpStatus.OK.value(), status);
+        Assertions.assertEquals(HttpStatus.NOT_FOUND.value(), status);
     }
 
     @SneakyThrows

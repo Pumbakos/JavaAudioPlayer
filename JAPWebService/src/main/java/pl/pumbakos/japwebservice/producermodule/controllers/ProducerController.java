@@ -36,7 +36,7 @@ public class ProducerController {
         return producer == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(producer);
     }
 
-    @PostMapping(consumes = "application/*")
+    @PostMapping(consumes = "application/json")
     public ResponseEntity<String> save(@Valid @RequestBody Producer producer) {
         //TODO: make return CREATED
         return service.save(producer) == null ?
@@ -44,14 +44,14 @@ public class ProducerController {
                 new ResponseEntity<>("Saved successfully.", HttpStatus.OK);
     }
 
-    @PutMapping(path = ID, consumes = "application/json", produces = "application/json")
+    @PutMapping(path = ID, consumes = "application/json", produces = "text/plain")
     public ResponseEntity<String> update(@RequestBody Producer producer, @PathVariable(name = "id") Long id) {
         return service.update(producer, id) ?
                 new ResponseEntity<>("Updated successfully.", HttpStatus.OK) :
-                new ResponseEntity<>("Check data you have entered.", HttpStatus.NOT_FOUND);
+                new ResponseEntity<>("Check data you have entered.", HttpStatus.BAD_REQUEST);
     }
 
-    @DeleteMapping(path = ID, produces = "application/json")
+    @DeleteMapping(path = ID, produces = "text/plain")
     public ResponseEntity<String> delete(@PathVariable(name = "id") Long id) {
         return service.delete(id) ?
                 new ResponseEntity<>("Deleted successfully.", HttpStatus.OK) :
